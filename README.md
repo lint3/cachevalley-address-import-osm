@@ -22,7 +22,7 @@ Some issues may occur when using this on more "squiggly" roads since I made some
   - This Script - Provides "translation" functionality
   - [QGIS](https://www.qgis.org/en/site/) - Desktop GIS Software
   - [`ogr2osm`](https://pypi.org/project/ogr2osm/), allows conversion from many formats to OSM features
-  - JOSM - Desktop OSM Editor
+  - [JOSM](https://josm.openstreetmap.de/) - Desktop OSM Editor
 3. Narrow Dataset
   - In QGIS, open data source, select AddressPoints downloaded from UGRC.
   - Add an OSM raster base layer if you want. Not necessary, it just helps me get my bearings.

@@ -1,15 +1,7 @@
 import ogr2osm
 import logging
 
-# addr:housenumber=123
-# addr:street=Street
-# addr:unit=5
-# addr:city=Logan
-# addr:state=UT
-# addr:postcode=zip
-
-
-
+datasource_parameter = 'addr_clarkston.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
   
@@ -198,7 +190,6 @@ logger = logging.getLogger('ogr2osm')
 logger.setLevel(logging.WARNING)
 logger.addHandler(logging.StreamHandler())
 
-datasource_parameter = 'addr_clarkston.gpkg'
 query = ''
 output_file = datasource_parameter.split('.')[0] + '.osm'
 

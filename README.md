@@ -15,9 +15,7 @@ Some issues may occur when using this on more "squiggly" roads since I made some
       - [OSM Wiki - Imports](https://wiki.openstreetmap.org/wiki/Import)
       - [OSM Wiki - Import Guidelines](https://wiki.openstreetmap.org/wiki/Import/Guidelines)
       - [OSM Wiki - Automated Edits Code of Conduct](https://wiki.openstreetmap.org/wiki/Automated_Edits_code_of_conduct)
-1. Download files
-    - This Script
-    - Address Points dataset from [UGRC](https://gis.utah.gov/data/location/address-data/) (Shapefile or GeoDatabase will do, I think)
+1. Download Data - Address Points dataset from [UGRC](https://gis.utah.gov/data/location/address-data/) (Shapefile or GeoDatabase will do, I think)
 2. Software Prerequisites
     - This Script - Provides "translation" functionality
     - [QGIS](https://www.qgis.org/en/site/) - Desktop GIS Software

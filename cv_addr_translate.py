@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = 'addr_clarkston.gpkg'
+datasource_parameter = '../testing/addr_nibley.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
   
@@ -84,11 +84,19 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     'TRLR':'Trailer',
     'UPPR':'Upper' }
     
-  def fixme(self, tags, message):
+  def fixme(self, tags, attrs, message):
     if 'FIXME' in tags:
       tags['FIXME'] = tags['FIXME'] + " Also, " + message
     else:
       tags['FIXME'] = "Automated Import: " + message
+      # Also add additional context
+      tags['note'] = "Address System: " + attrs['AddSystem']
+                   + ", fid: " + attrs['fid']
+                   + ", Object ID: " + attrs['OBJECTID']
+                   + ", County ID: " + attrs['CountyID']
+                   + ", Type: " + attrs['PtType']
+                   + ", Parcel ID: " + attrs['ParcelID']
+                   + ", USNG: " + attrs['USNG']
     
   def tagCheck(self, tags, fullAddress):
     requiredTags = [
@@ -97,7 +105,8 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       "addr:postcode",
       "addr:city",
       "addr:country",
-      "addr:state" ]
+      "addr:state",
+      "UGRC:import_uuid" ]
     
     for requiredTag in requiredTags:
       if not requiredTag in tags:
@@ -141,7 +150,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
         streetTag += ' ' + self.dirExpand[attrs['SuffixDir']]
       else:
         logger.warning("Saw feature (ObjectID " + attrs['OBJECTID'] + ") with PrefixDir " + attrs['PrefixDir'] + " but no StreetType or SuffixDir")
-        self.fixme(tags, 'This feature has no street type or suffix')
+        self.fixme(tags, attrs, 'This feature has no street type or suffix')
       
       tags["addr:street"] = streetTag
     
@@ -174,9 +183,13 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       tags['name'] = attrs['LandmarkNa'].title()
     
     tags['addr:country'] = 'US'
-    if not self.tagCheck(tags, attrs['FullAdd']):
-      self.fixme(tags, "Missing one or more required address tags")
+      
+    # Unique Identifier for later updates
+    if attrs['OBJECTID'] != '':
+      tags['UGRC:import_uuid'] = attrs['OBJECTID']
     
+    if not self.tagCheck(tags, attrs['FullAdd']):
+      self.fixme(tags, attrs, "Missing one or more required address tags")
     return tags
 
 

@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = '../testing/addr_nibley.gpkg'
+datasource_parameter = '../testing/addr_logan_subset.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
   
@@ -90,13 +90,12 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     else:
       tags['FIXME'] = "Automated Import: " + message
       # Also add additional context
-      tags['note'] = "Address System: " + attrs['AddSystem']
-                   + ", fid: " + attrs['fid']
-                   + ", Object ID: " + attrs['OBJECTID']
-                   + ", County ID: " + attrs['CountyID']
-                   + ", Type: " + attrs['PtType']
-                   + ", Parcel ID: " + attrs['ParcelID']
-                   + ", USNG: " + attrs['USNG']
+      tags['note'] = ("Address System: " + attrs['AddSystem'] +
+                      ", Object ID: " + attrs['OBJECTID'] +
+                      ", County ID: " + attrs['CountyID'] +
+                      ", Type: " + attrs['PtType'] +
+                      ", Parcel ID: " + attrs['ParcelID'] +
+                      ", USNG: " + attrs['USNG'])
     
   def tagCheck(self, tags, fullAddress):
     requiredTags = [
@@ -154,17 +153,19 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       
       tags["addr:street"] = streetTag
     
-    # Unit tags
+    # Unit tags - Type
+    unitTag = []
+    if attrs['UnitType'] != '':
+      if attrs['UnitType'] in self.unitTypeExpand:
+        unitTag.append(self.unitTypeExpand[attrs['UnitType']])
+      else:
+        unitTag.append(attrs['UnitType'].title())
+    
+    # Unit tags - ID
     if attrs['UnitID'] != '':
-      unitTag = attrs['UnitID']
-      
-      if attrs['UnitType'] != '':
-        if attrs['UnitType'] in self.unitTypeExpand:
-          unitTag += ' ' + self.unitTypeExpand[attrs['UnitType']]
-        else:
-          unitTag += ' ' + attrs['UnitType'].title()
-      
-      tags["addr:unit"] = unitTag
+      unitTag.append(attrs['UnitID'])
+    
+    tags["addr:unit"] = ' '.join(unitTag)
     
     # City Tag
     if attrs['City'] != '':
@@ -204,7 +205,7 @@ logger.setLevel(logging.WARNING)
 logger.addHandler(logging.StreamHandler())
 
 query = ''
-output_file = datasource_parameter.split('.')[0] + '.osm'
+output_file = '.'.join(datasource_parameter.split('.')[:-1]) + '.osm'
 
 translation_object = CacheAddrTranslation()
 datasource = ogr2osm.OgrDatasource(translation_object)

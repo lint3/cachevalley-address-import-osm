@@ -118,40 +118,27 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     
     
   def filter_tags(self, attrs):
-    if not attrs:
-      logger.warning("Saw feature with no attributes")
-      return
-    
     tags = {}
     
     # House Number Tag
-    if attrs['AddNum'] != '':
-      tags['addr:housenumber'] = attrs['AddNum']
-      if attrs['AddNumSuff'] != '':
-        # Add house number suffix if necessary (1/2, etc.)
-        if attrs['AddNumSuff'] != '':
-          tags['addr:housenumber'] = tags['addr:housenumber'] + ' ' + attrs['AddNumSuff']
-    else:
-      logger.warning("Saw feature with no address number")
+    tags['addr:housenumber'] = attrs['AddNum']
+      # Add house number suffix if necessary (1/2, etc.)
+    if attrs['AddNumSuff'] != '':
+      tags['addr:housenumber'] += ' ' + attrs['AddNumSuff']
     
     # Street Tag
-    if attrs['PrefixDir'] != '' and  attrs['StreetName'] != '':
-      
-      # Warn when null prefix
-      if attrs['PrefixDir'] == 'NULL':
-        logger.warning("Saw feature with PrefixDir == NULL")
-      
-      streetTag = self.dirExpand[attrs['PrefixDir']] + ' ' + attrs['StreetName'].title()
-      
-      if attrs['StreetType'] != '':
-        streetTag += ' ' + self.streetTypeExpand[attrs['StreetType']]
-      elif attrs['SuffixDir'] != '':
-        streetTag += ' ' + self.dirExpand[attrs['SuffixDir']]
-      else:
-        logger.warning("Saw feature (ObjectID " + attrs['OBJECTID'] + ") with PrefixDir " + attrs['PrefixDir'] + " but no StreetType or SuffixDir")
-        self.fixme(tags, attrs, 'This feature has no street type or suffix')
-      
-      tags["addr:street"] = streetTag
+    streetTag = ''
+    if attrs['PrefixDir'] != '':
+      streetTag += self.dirExpand[attrs['PrefixDir']]
+    streetTag += ' ' + attrs['StreetName'].title() # StreetName is required
+    if attrs['StreetType'] != '':
+      streetTag += ' ' + self.streetTypeExpand[attrs['StreetType']]
+    elif attrs['SuffixDir'] != '':
+      streetTag += ' ' + self.dirExpand[attrs['SuffixDir']]
+    else: # Either Street Type ("Ave", etc.) or suffix ("East") is required
+      logger.warning("Saw feature (ObjectID " + attrs['OBJECTID'] + ") with PrefixDir " + attrs['PrefixDir'] + " but no StreetType or SuffixDir")
+      self.fixme(tags, attrs, 'This feature has no street type or suffix')
+    tags["addr:street"] = streetTag
     
     # Unit tags - Type
     unitTag = []
@@ -160,34 +147,22 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
         unitTag.append(self.unitTypeExpand[attrs['UnitType']])
       else:
         unitTag.append(attrs['UnitType'].title())
-    
     # Unit tags - ID
     if attrs['UnitID'] != '':
       unitTag.append(attrs['UnitID'])
+    if unitTag:
+      tags["addr:unit"] = ' '.join(unitTag)
     
-    tags["addr:unit"] = ' '.join(unitTag)
-    
-    # City Tag
-    if attrs['City'] != '':
-      tags["addr:city"] = attrs['City'].title()
-    
-    # Post Code Tag
-    if attrs['ZipCode'] != '':
-      tags["addr:postcode"] = attrs['ZipCode']
-    
-    # State tag
-    if attrs['State'] != '':
-      tags["addr:state"] = attrs['State']
-    
+    # Other Required Tags
+    tags["addr:city"] = attrs['City'].title()
+    tags["addr:postcode"] = attrs['ZipCode']
+    tags["addr:state"] = attrs['State']
+    tags['addr:country'] = 'US'
+    tags['UGRC:import_uuid'] = attrs['OBJECTID']
+
     # Name tag
     if attrs['LandmarkNa'] != '':
       tags['name'] = attrs['LandmarkNa'].title()
-    
-    tags['addr:country'] = 'US'
-      
-    # Unique Identifier for later updates
-    if attrs['OBJECTID'] != '':
-      tags['UGRC:import_uuid'] = attrs['OBJECTID']
     
     if not self.tagCheck(tags, attrs['FullAdd']):
       self.fixme(tags, attrs, "Missing one or more required address tags")

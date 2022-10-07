@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = '../testing/addr_logan_subset.gpkg'
+datasource_parameter = 'sample_data/addr_logan_subset.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
 
@@ -268,7 +268,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
 
 
 logger = logging.getLogger('ogr2osm')
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARNING)
 logger.addHandler(logging.StreamHandler())
 
 query = ''

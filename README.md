@@ -44,7 +44,8 @@ Some issues may occur when using this on more "squiggly" roads since I made some
     - Select the relevant data to be merged *into* (existing OSM data), then freeze under **subject**.
         - See [sample list of features](josm_features.txt) for a good starting point search.
     - Click Generate Matches. In the Conflation panel, review matched and unmatched items in the reference and subject sets. Select the items in the list in Matches and Reference Only, and press Conflate button.
-    - Use the map and "matches" tab to ensure everything looks good.
+    - Use the map and "matches" tab to ensure everything looks good:
+    - ![Map](imgs/conflation_example.png)
     - Decide if any "Subject Only" items should be removed. These would be buildings or addresses that already exist in OSM, but not in the import dataset.
     - Select desired merge operations and press Conflate.
 7. Upload to OSM

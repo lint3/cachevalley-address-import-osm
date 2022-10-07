@@ -4,7 +4,7 @@ import logging
 datasource_parameter = '../testing/addr_logan_subset.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
-  
+
   logger = logging.getLogger('ogr2osm')
     
   dirExpand = {
@@ -115,10 +115,9 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       "UGRC:import_uuid" ]
     
     for requiredTag in requiredTags:
-      if not requiredTag in tags:
+      if requiredTag not in tags:
         logger.warning("Saw feature missing " + requiredTag + " tag")
         return False
-    
     
     return True
     
@@ -239,8 +238,8 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
             pass
           
           # One of them doesn't have a value, and nothing on blacklist, so OK to merge
-          if (tags_new[new_key] == '' or exist_value == '') and not new_key in never_merge_tags:
-            pass 
+          if (tags_new[new_key] == '' or exist_value == '') and new_key not in never_merge_tags:
+            pass
           
           if new_key in never_merge_tags:
             return None
@@ -253,7 +252,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
             else:
               pass
       
-      elif not new_key in tags_existing and new_key in never_merge_tags:
+      elif new_key not in tags_existing and new_key in never_merge_tags:
         return None # Never merge
 
     for exist_key in tags_existing:
@@ -285,10 +284,3 @@ osmdata.process(datasource)
 
 datawriter = ogr2osm.OsmDataWriter(output_file)
 osmdata.output(datawriter)
-
-
-
-
-
-    
-    

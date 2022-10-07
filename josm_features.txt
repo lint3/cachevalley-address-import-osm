@@ -1,0 +1,42 @@
+(
+building=house
+or building=*
+or amenity=place_of_worship
+or amenity=school
+or shop=*
+or amenity=restaurant
+or amenity=fast_food
+or healthcare=*
+or amenity=fuel
+or tourism=hotel
+or amenity=bank
+or amenity=*
+or healthcare=*
+or tourism=hotel
+or office=*
+or leisure=park
+)
+
+-(
+public_transport=platform
+or power=substation
+or amenity=bench
+or type:relation
+or waterway=*
+or highway=*
+or landuse=*
+or amenity=parking
+or leisure=pitch
+or leisure=plauground
+or ways:1-
+or traffic_sign=*
+or emergency=fire_hydrant
+or -*=*
+or building=shed
+or building=garage
+or building=church
+or building=school
+or building=hotel
+or building=roof
+or building-
+)

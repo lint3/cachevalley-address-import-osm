@@ -83,6 +83,13 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     'STE':'Suite',
     'TRLR':'Trailer',
     'UPPR':'Upper' }
+  
+  # For when the unit ID comes before unit type, for example Basement Apartment
+  unitIdExceptions = {
+    'MAIN':'Main',
+    'REAR':'Rear',
+    'UPPR':'Upper',
+    'BSMT':'Basement'}
     
   def fixme(self, tags, attrs, message):
     if 'FIXME' in tags:
@@ -112,7 +119,6 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
         logger.warning("Saw feature missing " + requiredTag + " tag")
         return False
     
-    logger.info("Feature " + fullAddress + " passed tagCheck")
     
     return True
     
@@ -125,6 +131,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       # Add house number suffix if necessary (1/2, etc.)
     if attrs['AddNumSuff'] != '':
       tags['addr:housenumber'] += ' ' + attrs['AddNumSuff']
+      tags["UGRC:address_type"] = 'secondary'
     
     # Street Tag
     streetTag = ''
@@ -140,43 +147,129 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       self.fixme(tags, attrs, 'This feature has no street type or suffix')
     tags["addr:street"] = streetTag
     
-    # Unit tags - Type
+    # Unit tags
     unitTag = []
-    if attrs['UnitType'] != '':
-      if attrs['UnitType'] in self.unitTypeExpand:
-        unitTag.append(self.unitTypeExpand[attrs['UnitType']])
+    uT = attrs['UnitType']
+    uI = attrs['UnitID']
+    
+    if uT != '' and uI == '': # Unit Type but no ID, addr:unit is Type
+      if uT in self.unitTypeExpand:
+        unitTag.append(self.unitTypeExpand[uT])
       else:
-        unitTag.append(attrs['UnitType'].title())
-    # Unit tags - ID
-    if attrs['UnitID'] != '':
-      unitTag.append(attrs['UnitID'])
+        unitTag.append(uT)
+        
+    elif uT == '' and uI != '': # Unit ID but no Type, addr:unit is ID
+      if uI in self.unitIdExceptions:
+        unitTag.append(self.unitIdExceptions[uI])
+      else:
+        unitTag.append(uI.title())
+        
+    elif uT != '' and uI != '': # Both unit Type and ID
+      if uI in self.unitIdExceptions: # Add ID first in these exception cases
+        unitTag.append(self.unitIdExceptions[uI])
+        
+        if uT in self.unitTypeExpand:
+          unitTag.append(self.unitTypeExpand[uT])
+        else:
+          unitTag.append(uT.title())
+          
+      else: # Otherwise add Type first
+        if uT in self.unitTypeExpand:
+          unitTag.append(self.unitTypeExpand[uT])
+        else:
+          unitTag.append(uT.title())
+        unitTag.append(uI)
+    
+        
+    # Do nothing if neither type nor ID
+    
     if unitTag:
       tags["addr:unit"] = ' '.join(unitTag)
+      tags["UGRC:address_type"] = 'secondary'
     
     # Other Required Tags
-    tags["addr:city"] = attrs['City'].title()
+    tags["addr:city"] = attrs['City'].title().removesuffix("City").strip()
     tags["addr:postcode"] = attrs['ZipCode']
     tags["addr:state"] = attrs['State']
     tags['addr:country'] = 'US'
     tags['UGRC:import_uuid'] = attrs['OBJECTID']
+    if len(tags['UGRC:import_uuid']) < 2:
+      logger.warning("Something is amiss")
 
     # Name tag
     if attrs['LandmarkNa'] != '':
       tags['name'] = attrs['LandmarkNa'].title()
+      
+    # Primary is default value
+    if "UGRC:address_type" not in tags:
+      tags["UGRC:address_type"] = 'primary'
     
     if not self.tagCheck(tags, attrs['FullAdd']):
       self.fixme(tags, attrs, "Missing one or more required address tags")
     return tags
+    
+  def ensureDictKeysAreLists(self, d):
+    result = {}
+    for key in d:
+      if not isinstance(d[key], list):
+        result[key] = [d[key]]
+      else:
+        result[key] = d[key]
+    return result
+    
 
+  def merge_tags(self, geometry_type, tags_existing, tags_new):
+    
+    tags_existing = self.ensureDictKeysAreLists(tags_existing)
+    
+    never_merge_tags = [
+      "addr:unit",]
+    
+    always_merge_tags = [
+      "UGRC:import_uuid" ]
+    
+    for new_key in tags_new:
+      
+      if new_key in tags_existing and (new_key in never_merge_tags or new_key in always_merge_tags):
+        # They both have the tag
+        for exist_value in tags_existing[new_key]:
+          
+          # And the value matches
+          if tags_new[new_key] == exist_value:
+            pass
+          
+          # One of them doesn't have a value, and nothing on blacklist, so OK to merge
+          if (tags_new[new_key] == '' or exist_value == '') and not new_key in never_merge_tags:
+            pass 
+          
+          if new_key in never_merge_tags:
+            return None
+            
+          # Conflicting values
+          if tags_new[new_key] != exist_value:
+            if new_key not in always_merge_tags:
+              # Not in whitelist
+              return None
+            else:
+              pass
+      
+      elif not new_key in tags_existing and new_key in never_merge_tags:
+        return None # Never merge
 
+    for exist_key in tags_existing:
+      if exist_key in tags_new:
+        pass # This case already covered
+      if exist_key in never_merge_tags:
+        return None
+      
 
-
-
-
+    tags_existing['UGRC:address_type'] = ['primary']
+    tags_new['UGRC:address_type'] = 'primary'
+    return ogr2osm.TranslationBase.merge_tags(self, geometry_type, tags_existing, tags_new)
 
 
 logger = logging.getLogger('ogr2osm')
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
 query = ''

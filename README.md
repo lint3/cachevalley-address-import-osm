@@ -25,7 +25,7 @@ Some issues may occur when using this on more "squiggly" roads since I made some
 3. Narrow Dataset
     - In QGIS, open data source, select AddressPoints downloaded from UGRC.
     - Add an OSM raster base layer if you want. Not necessary, it just helps me get my bearings.
-    - Right-click on AddressPoints layer, hit filter, choose a city and apply the filter. Expression should look something like `"City" = 'CLARKSTON'`. Hit OK.
+    - Right-click on AddressPoints layer, hit filter, choose a city and apply the filter. Click OK.
     - ![Clarkston Map with Address Points](imgs/clarkston_addresses.png)
     - Right-click on now filtered AddressPoints layer, then Export. I think a few different formats should work, but I left it on GeoPackage. Choose a filename, the rest of the options should be OK at default.
 4. Translate tags
@@ -39,8 +39,13 @@ Some issues may occur when using this on more "squiggly" roads since I made some
     - In JOSM, download the relevant OSM data for the area. You probably want to "ignore" any existing issues in the Validator panel so you can see new ones you might create.
     - Show the Conflation panel. Click Configure there. 
     - Select all data to be imported, then "freeze" it under the **reference** section.
-    - Select the relevant data to be merged *into* (existing OSM data), then freeze under **subject**. This should probably be done by searching `building=* type:way`.
+        - The translation script will assign a "UGRC:address_type" tag, "primary" addresses are more likely to be good merge candidates for buildings.
+        - If desired, select import data, do a search for "UGRC:address_type"=primary before freezing reference selection.
+    - Select the relevant data to be merged *into* (existing OSM data), then freeze under **subject**.
+        - See [sample list of features](josm_features.txt) for a good starting point search.
     - Click Generate Matches. In the Conflation panel, review matched and unmatched items in the reference and subject sets. Select the items in the list in Matches and Reference Only, and press Conflate button.
+    - Use the map and "matches" tab to ensure everything looks good.
     - Decide if any "Subject Only" items should be removed. These would be buildings or addresses that already exist in OSM, but not in the import dataset.
+    - Select desired merge operations and press Conflate.
 7. Upload to OSM
     - Be sure to follow recommended guidelines such as tagging changesets as autmated, using a bot account, etc.

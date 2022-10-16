@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = 'sample_data/addr_logan_subset.gpkg'
+datasource_parameter = '../addr_newton.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
 
@@ -92,10 +92,10 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     'BSMT':'Basement'}
     
   def fixme(self, tags, attrs, message):
-    if 'FIXME' in tags:
-      tags['FIXME'] = tags['FIXME'] + " Also, " + message
+    if 'fixme' in tags:
+      tags['fixme'] = tags['fixme'] + " Also, " + message
     else:
-      tags['FIXME'] = "Automated Import: " + message
+      tags['fixme'] = "Automated Import: " + message
       # Also add additional context
       tags['note'] = ("Address System: " + attrs['AddSystem'] +
                       ", Object ID: " + attrs['OBJECTID'] +

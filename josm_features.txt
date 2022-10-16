@@ -15,6 +15,7 @@ or healthcare=*
 or tourism=hotel
 or office=*
 or leisure=park
+or "addr\:"*=*
 )
 
 -(

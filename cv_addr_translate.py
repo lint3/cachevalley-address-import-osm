@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = '../addr_newton.gpkg'
+datasource_parameter = '../addr_providence.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
 
@@ -144,7 +144,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     else: # Either Street Type ("Ave", etc.) or suffix ("East") is required
       logger.warning("Saw feature (ObjectID " + attrs['OBJECTID'] + ") with PrefixDir " + attrs['PrefixDir'] + " but no StreetType or SuffixDir")
       self.fixme(tags, attrs, 'This feature has no street type or suffix')
-    tags["addr:street"] = streetTag
+    tags["addr:street"] = streetTag.strip()
     
     # Unit tags
     unitTag = []
@@ -191,9 +191,6 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
     tags["addr:postcode"] = attrs['ZipCode']
     tags["addr:state"] = attrs['State']
     tags['addr:country'] = 'US'
-    tags['UGRC:import_uuid'] = attrs['OBJECTID']
-    if len(tags['UGRC:import_uuid']) < 2:
-      logger.warning("Something is amiss")
 
     # Name tag
     if attrs['LandmarkNa'] != '':

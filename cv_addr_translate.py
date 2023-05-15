@@ -1,7 +1,7 @@
 import ogr2osm
 import logging
 
-datasource_parameter = '../addr_providence.gpkg'
+datasource_parameter = '../address/addr_logan.gpkg'
 
 class CacheAddrTranslation(ogr2osm.TranslationBase):
 
@@ -111,8 +111,7 @@ class CacheAddrTranslation(ogr2osm.TranslationBase):
       "addr:postcode",
       "addr:city",
       "addr:country",
-      "addr:state",
-      "UGRC:import_uuid" ]
+      "addr:state" ]
     
     for requiredTag in requiredTags:
       if requiredTag not in tags:

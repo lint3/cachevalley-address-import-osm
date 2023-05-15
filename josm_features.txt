@@ -16,10 +16,18 @@ or tourism=hotel
 or office=*
 or leisure=park
 or "addr\:"*=*
+or residential=apartments
 )
 
 -(
 public_transport=platform
+or amenity=bicycle_parking
+or amenity=bicycle_repair_station
+or amenity=charging_station
+or amenity=polling_station
+or amenity=post_box
+or amenity=shelter
+or amenity=toilets
 or power=substation
 or amenity=bench
 or type:relation

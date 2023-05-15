@@ -34,19 +34,21 @@ Some issues may occur when using this on more "squiggly" roads since I made some
     - Watch for warnings/errors in console. The script should add FIXME tags to anything that might have an issue.
 5. Inspect Output
     - Launch JOSM, open the `.osm` file. Hit ctrl+A to select all points, and look at the tag inspector for anything that looks out of place.
-    - You can do a search for `FIXME=*` to check out any issues and fix before uploading.
+    - You can do a search for `fixme=*` to check out any issues and fix before uploading.
 6. Handle Conflation (See [conflation usage](https://wiki.openstreetmap.org/wiki/JOSM/Plugins/Conflation#Usage))
-    - In JOSM, download the relevant OSM data for the area. You probably want to "ignore" any existing issues in the Validator panel so you can see new ones you might create.
+    - In JOSM, download the relevant OSM data for the area.
     - Show the Conflation panel. Click Configure there. 
     - Select all data to be imported, then "freeze" it under the **reference** section.
         - The translation script will assign a "UGRC:address_type" tag, "primary" addresses are more likely to be good merge candidates for buildings.
         - If desired, select import data, do a search for "UGRC:address_type"=primary before freezing reference selection.
     - Select the relevant data to be merged *into* (existing OSM data), then freeze under **subject**.
         - See [sample list of features](josm_features.txt) for a good starting point search.
-    - Click Generate Matches. In the Conflation panel, review matched and unmatched items in the reference and subject sets. Select the items in the list in Matches and Reference Only, and press Conflate button.
-    - Use the map and "matches" tab to ensure everything looks good:
-    - ![Map](imgs/conflation_example.png)
-    - Decide if any "Subject Only" items should be removed. These would be buildings or addresses that already exist in OSM, but not in the import dataset.
-    - Select desired merge operations and press Conflate.
+    - Click Generate Matches. In the Conflation panel, review matches.
+        - You can sort by distance to initially weed out questionable items.
+        - You can sort by conflict to work those out before proceeding.
+        - You can select one or many features on the map, then click Conflate or Remove to approve or deny their corresponding conflation operations.
+    - Reference Only items can usually be conflated (read: added to subject layer) without too much trouble.
+    - Subject Only items can usually be left alone.
+    - Conflation step is the most critical step in lining things up correctly. Don't rush!
 7. Upload to OSM
     - Be sure to follow recommended guidelines such as tagging changesets as autmated, using a bot account, etc.

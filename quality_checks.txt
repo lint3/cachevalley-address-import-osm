@@ -1,0 +1,9 @@
+/* Providence, UT */
+area[name="Providence"][admin_level=8][boundary=administrative]["is_in:state_code"="UT"]->.cityarea;
+way(area.cityarea)["addr:postcode"]["addr:postcode"!="84332"];
+out geom;
+
+/* Newton, UT */
+area[name="Newton"][admin_level=8][boundary=administrative]["is_in:state_code"="UT"]->.cityarea;
+way(area.cityarea)["addr:postcode"]["addr:postcode"!="84327"];
+out geom;

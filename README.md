@@ -51,4 +51,14 @@ Some issues may occur when using this on more "squiggly" roads since I made some
     - Subject Only items can usually be left alone.
     - Conflation step is the most critical step in lining things up correctly. Don't rush!
 7. Upload to OSM
-    - Be sure to follow recommended guidelines such as tagging changesets as autmated, using a bot account, etc.
+
+Include the following tags in your changeset:
+
+```
+import=yes
+mechanical=yes
+created_by=___
+source=Utah AGRC
+comment=Import addresses from Utah's dataset
+description=https://wiki.openstreetmap.org/wiki/Utah/CacheValleyAddressImport
+```

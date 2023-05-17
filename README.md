@@ -50,7 +50,14 @@ Some issues may occur when using this on more "squiggly" roads since I made some
     - Reference Only items can usually be conflated (read: added to subject layer) without too much trouble.
     - Subject Only items can usually be left alone.
     - Conflation step is the most critical step in lining things up correctly. Don't rush!
-7. Upload to OSM
+
+7. QA
+
+    - Select all modified features and go through the tags list. Be sure that no "temporary" or unnecessary tags have been left.
+    - Check to see if any `fixme` items can be resolved before upload.
+    - Run JOSM validation tool to search for any additional issues.
+
+8. Upload to OSM
 
 Include the following tags in your changeset:
 
